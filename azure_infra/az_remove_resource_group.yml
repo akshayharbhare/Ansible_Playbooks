@@ -1,0 +1,8 @@
+- name: Playbook to delete a resource group in Azure!
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: Delete a resource group.
+    azure_rm_resourcegroup:
+      name: "{{resource_group}}"
+      state: absent 

@@ -1,0 +1,5 @@
+---
+# defaults file for snow
+snow_admin: "admin"
+snow_password: "alphaservep0v"
+snow_instance: "alphaservepov"

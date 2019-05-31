@@ -1,0 +1,20 @@
+---
+# defaults file for owncloud
+pkgs:
+#- epel-release
+- nginx
+- mariadb
+- mariadb-server
+- php-fpm
+- php-cli
+- php-gd
+- php-mcrypt
+- php-mysql
+- php-pear
+- php-xml
+- bzip2
+- vim
+
+ports_allow:
+- http
+- https

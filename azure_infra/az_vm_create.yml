@@ -1,0 +1,29 @@
+- name: Create Azure VM
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: Create VM
+    azure_rm_virtualmachine:
+      resource_group: "{{resource_group}}"
+      name: "{{vm_name}}"
+      vm_size: Standard_D1_v2
+      admin_username: "{{admin_username}}"
+      admin_password: "{{admin_password}}"
+      ssh_password_enabled: true
+      public_ip_allocation_method: Dynamic
+      open_ports: 
+        - 8080
+        - 22
+        - 80
+        - 8081
+        - 8082
+      ssh_public_keys: 
+        - path: /home/{{admin_username}}/.ssh/authorized_keys
+          key_data: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQChUlevaetQUGqi5unCmF1fMsOwOUQ8hq18ginTUreSYSYYTUD57mwt8jdKK+F5lD7LLqKTxMii4PZkIq+77OP7nnFgJud/S9vtXon6YKgUIyIg+4iHLlhpgta7/CS2kY3oTgIAc45Rzzc31O5u9uxnPciLPzFGzM/amy0C/mULSHMVSZI7NJSvB1pOg2qveYMr4RfB9VpbcIyDpxKmhgn6EZwXk7JksvDe1bvag036Yse0cd9cdOjQdOjgWbdFJj5w5ZwGiq6vyj0ruGZmzPM70+vqArEmKG0V6SPpMPRIu98ghZIheEMiyV88dz3AHQ2lEIcqIP+CZgoxsUyoEqUJ devopsuser@Forge-AnsibleTower001"
+      image:
+        offer: CentOS
+        publisher: OpenLogic
+        sku: '7.1'
+        version: latest
+  - debug:
+     msg: "Public IP: {{ azure_vm.properties.networkProfile.networkInterfaces[0]['properties'].ipConfigurations[0]['properties'].publicIPAddress.properties.ipAddress  }} "

@@ -1,0 +1,51 @@
+---
+# tasks file for Hardening_of_SSH_through_Access_Rule_Implementation
+
+- name: check directory existance
+  stat: 
+    path: '{{ backup_dir }}/hardening'
+  register: hard_dir
+  ignore_errors: yes
+
+- name: creating backup directory
+  file: 
+    path: '{{ backup_dir }}/hardening'
+    state: directory
+  when: hard_dir.stat.exists == false
+
+
+- name: check backup file existance
+  stat: 
+    path: '{{ backup_dir }}/hardening/host.deny'
+  register: hostd
+  ignore_errors: yes
+
+- name: backup of hosts.deny file
+  copy:
+    src: /etc/hosts.deny 
+    dest: '{{ backup_dir }}/hardening/hosts.deny'
+  when: hostd.stat.exists == false
+
+
+- name: check backup file existance
+  stat: 
+    path: '{{ backup_dir }}/hardening/host.allow'
+  register: hosta
+  ignore_errors: yes
+
+- name: backup of hosts.allow file
+  copy:
+    src: /etc/hosts.allow
+    dest: '{{ backup_dir }}/hardening/hosts.allow'
+  when: hosta.stat.exists == false
+
+
+- name: Applying Allow Rules
+  template: 
+    src: hosts.allow.j2  
+    dest: /etc/hosts.allow  
+
+- name: Applying Denying Rules
+  template: 
+    src: hosts.deny.j2
+    dest: /etc/hosts.deny

@@ -1,0 +1,6 @@
+---
+- hosts: winows_nodes
+  tasks: 
+  - name: user adding on managed nodes
+    win_shell: dsadd user "CN=prodev002,CN=Users,DC=cobalt,DC=oneeight,DC=com"  -samid prodev002 -pwd Pr0dev@ns -fn prodev002 -ln devops  -display "prodev002 devops" -pwdneverexpires yes -memberof "CN=Remote Management Users DC=cobalt,DC=oneeight,DC=com"
+    ignore_errors: yes

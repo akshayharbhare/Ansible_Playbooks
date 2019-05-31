@@ -1,0 +1,8 @@
+---
+# tasks file for snow
+- include: create.yml
+  when: "action == 'create'"
+- include: update.yml
+  when: "action == 'update'"
+- include: delete.yml
+  when: "action == 'delete'"

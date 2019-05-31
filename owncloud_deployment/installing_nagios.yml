@@ -1,0 +1,17 @@
+---
+- hosts: localhost
+  tasks:
+  - name: downloading nagios analyzer install file
+    get_url:
+      url: https://assets.nagios.com/downloads/nagios-network-analyzer/install.sh
+      dest: /opt/install.sh
+      mode: 0777
+   
+
+  - name: running nagios analyzer install file
+    shell: /opt/install.sh
+
+  - debug: msg="Nagios Network Analyzer Installation Success!"
+
+  - debug: msg="You can finish the final setup steps for Nagios Network Analyzer by visiting:
+                                    http://<server_ip_address>/nagiosna/"

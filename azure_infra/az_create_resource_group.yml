@@ -1,0 +1,8 @@
+- name: Playbook to create a resource group in Azure!
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: Create a resource group.
+    azure_rm_resourcegroup:
+      name: "{{resource_group}}"
+      location: "{{resource_location}}"

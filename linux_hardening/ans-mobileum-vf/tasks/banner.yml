@@ -1,0 +1,33 @@
+---
+# tasks file for banner message
+- name: Check the status of Directory
+  stat: 
+    path: '{{ backup_dir }}/banner'
+  register: banner_dir
+- debug: var=banner_dir
+- name: Create a directory for backup
+#  file:
+#    path: '{{ backup_dir }}/banner'
+#    state: directory
+#    mode: 0755
+#  when: banner_dir.stat.exists == False
+  command: mkdir -p {{ item }}/banner 
+  with_items: "{{backup_dir}}"
+- name: Create a backup file /etc/motd with timestamp
+  command: cp -rf /etc/motd  '{{ item }}/banner/motd'
+  with_items: "{{ backup_dir }}"
+- name: Create a backup file /etc/issue with timestamp
+  command: cp /etc/issue '{{ item }}/banner/issue'
+
+  with_items: "{{ backup_dir }}"
+- name: Create a backup /etc/issue.net with timestamp
+  command: cp /etc/issue.net '{{ item }}/banner/issue.net'
+
+  with_items: "{{ backup_dir }}"
+- name: Set Warning Banner for Standard Login Services
+  template: src=common-motd.j2 dest={{ item }} backup=yes
+  changed_when: false
+  with_items:
+    - /etc/motd
+    - /etc/issue
+    - /etc/issue.net

@@ -1,0 +1,18 @@
+---
+- hosts:  "{{hostname}}"
+  tasks:
+  - name: Create Directory
+    win_file: 
+      path: C:\vbscript
+      state: directory
+    when: hostname == "windows"
+ 
+ - name: Copy Scipt file to Windows
+   win_copy: 
+     src: WindowsScript.vbs 
+     dest: c:\vbscript\WindowsScript.vbs
+   when: hostname == "windows"
+ 
+ - name: Execute Windows Script
+   win_shell: C:\vbscript\WindowsScript.vbs
+   when: hostname == "windows"

@@ -1,0 +1,14 @@
+---
+# handlers file for mobileum
+
+- name: start_auditd
+  service:
+    name: auditd 
+    state: started 
+    enabled: yes
+
+- name: Restart sshd
+  service:
+    name: sshd
+    state: restarted
+    enabled: yes

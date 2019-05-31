@@ -1,0 +1,25 @@
+---
+
+- hosts: "{{hostname}}"
+  tasks:
+  - name: Check if TCP/5986 is open on the node
+    wait_for:
+      host: "{{inventory_hostname}}"
+      port: 5986
+      timeout: 10
+    ignore_errors: true
+    delegate_to: localhost
+    register: is_windows
+    when: hostname == "windows"
+  
+  - name: Check for Machine Status ON
+    debug: msg="{{ansible_hostname}} is Started"
+    when: is_windows|success
+    when: hostname == "windows"
+
+  - name: Check for Machine Status OFF
+    debug: msg="{{ansible_hostname}} is Switchoff"
+    when: is_windows.state != "started"
+    when: hostname == "windows"
+
+

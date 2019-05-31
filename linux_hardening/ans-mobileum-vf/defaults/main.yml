@@ -1,0 +1,35 @@
+---
+# Default values of Password_Policy
+pam_pwquality_difok: 5
+pam_pwquality_minlen: 9
+pam_pwquality_dcredit: 1
+pam_pwquality_ucredit: 1
+pam_pwquality_lcredit: 1
+pam_pwquality_ocredit: 1
+pam_pwquality_minclass: 1
+pam_pwquality_maxrepeat: 1
+pam_pwquality_maxclassrepeat: 1
+pam_pwquality_gecoscheck: 0
+
+PASS_MAX_DAYS:   99999
+PASS_MIN_DAYS:   0
+PASS_MIN_LEN:    9
+PASS_MAX_LEN:    20
+PASS_WARN_AGE:   7
+
+
+# Defaults for ssh
+sshd_port: 22
+sshd_protocol: 2
+sshd_serverkeybits: 1024
+sshd_logingracetime: 600
+sshd_keyregeninterval: 300
+sshd_hostkey: /etc/ssh/ssh_host_key
+sshd_sftp: /usr/libexec/openssh/sftp-server
+sshd_authorized_key: .ssh/authorized_keys
+sshd_banner: /etc/ssh/sshd-banner
+sshd_aliveinterval: 300
+sshd_alivecount: 3
+sshd_syslogfacility: AUTH
+sshd_loglevel: INFO
+

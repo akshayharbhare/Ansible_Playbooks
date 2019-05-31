@@ -1,0 +1,38 @@
+---
+# tasks file for mobileum
+- name: adding sudo user
+  tags: sudo
+  include: adding_sudo_user.yml
+- name: password_policy
+  tags: ppolicy
+  include: password_policy.yml
+- name: enabling_audit 
+  tags: audit
+  include: enabling_audit.yml
+- name: crontab 
+  tags: crontab
+  include: crontab.yml
+- name: dummy_shell
+  tags: dummy
+  include: dummy_shell.yml
+- name:  banner
+  tags: banner
+  include: banner.yml
+- name: remove_package 
+  tags: remove
+  include: remove_package.yml
+- name: port_services 
+  tags: port
+  include: port_services.yml
+- name: screenblank 
+  tags: screen
+  include: screenblank.yml
+- name: ctl_alt
+  tags: ctl
+  include: disable_ctrl_alt_del.yml
+- name: ssh
+  tags: ssh
+  include: ssh.yml
+- name: hardening_ssh 
+  tags: hdssh
+  include: hardening_ssh.yml

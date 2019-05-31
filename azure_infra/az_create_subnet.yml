@@ -1,0 +1,10 @@
+- name: Playbook to create subnet in Azure!
+  hosts: localhost
+  connection: local
+  tasks:    
+  - name: Create a subnet
+    azure_rm_subnet:
+      name: "{{subnet}}"
+      virtual_network_name: "{{virtual_network}}"
+      resource_group: "{{resource_group}}"
+      address_prefix_cidr: "{{subnet_cidr}}"

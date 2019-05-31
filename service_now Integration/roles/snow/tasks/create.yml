@@ -1,0 +1,13 @@
+---
+# create tasks file for snow
+- name: Create an incident
+  snow_record:
+    username: "{{ snow_admin }}"
+    password: "{{ snow_password }}"
+    instance: "{{ snow_instance }}"
+    state: present
+    data:
+      short_description: "{{ description }}"
+      severity: "{{ sev }}"
+      priority: "{{ priority }}"
+  register: new_incident

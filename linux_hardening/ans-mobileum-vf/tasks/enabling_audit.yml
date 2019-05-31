@@ -1,0 +1,20 @@
+---
+# tasks file for Enabling the Audit SubSystem
+- name: install auditd if already not installed
+  yum: 
+    name: audit 
+    state: latest
+ 
+- name: start auditd service
+  command: ls
+  notify: start_auditd
+
+- name: configure auditd file
+  lineinfile: 
+    dest: /etc/pam.d/system-auth
+    line: 'session  required pam_tty_audit.so  enable=*'
+
+- name: configure /etc/pam.d/sshd 
+  lineinfile: 
+    dest: /etc/pam.d/sshd 
+    line: 'session required pam_tty_audit.so enable=*'

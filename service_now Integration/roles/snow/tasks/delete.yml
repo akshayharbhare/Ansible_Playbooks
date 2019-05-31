@@ -1,0 +1,10 @@
+---
+# delete tasks file for snow
+- name: Delete an incident
+  snow_record:
+    username: "{{ snow_admin }}"
+    password: "{{ snow_password }}"
+    instance: "{{ snow_instance }}"
+    state: absent
+    number: "{{ number }}"
+  failed_when: false

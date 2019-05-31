@@ -1,0 +1,38 @@
+# tasks file for Adding and Blocking ports_services to firewall
+- name: Adding Ports 
+  firewalld: 
+    port: "{{ item }}"
+    permanent: true
+    state: enabled
+  with_items:
+  - "{{ ports_allow }}"
+
+- name: Blocking Ports
+  firewalld:
+    port: "{{ item }}"
+    permanent: true
+    state: disabled
+  with_items:
+  - "{{ ports_deny }}"
+
+- name: Adding Services
+  firewalld:
+    service: "{{ item }}"
+    permanent: true
+    state: enabled
+  with_items:
+  - "{{ services_allow }}"
+
+- name: Blocking Services
+  firewalld:
+    service: "{{ item }}"
+    permanent: true
+    state: disabled
+  with_items:
+  - "{{ services_deny }}"
+
+- name: reloadind firewall
+  service:
+    name: firewalld
+    state: restarted
+    enabled: yes

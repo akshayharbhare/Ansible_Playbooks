@@ -1,0 +1,11 @@
+---
+# update tasks file for snow
+- name: Update an incident
+  snow_record:
+    username: "{{ snow_admin }}"
+    password: "{{ snow_password }}"
+    instance: "{{ snow_instance }}"
+    state: present
+    number: "{{ number }}"
+    data:
+      work_nodes: "{{ description }}"

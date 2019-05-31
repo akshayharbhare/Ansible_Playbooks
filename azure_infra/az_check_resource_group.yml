@@ -1,0 +1,10 @@
+- name: Playbook to delete a resource group in Azure!
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: Get facts for all resource groups
+    azure_rm_resourcegroup_facts:
+  - debug:
+      msg: "Existing resource groups are: {%for n in azure_resourcegroups%}
+                  {{ n['name'] }}
+            {%endfor%}"

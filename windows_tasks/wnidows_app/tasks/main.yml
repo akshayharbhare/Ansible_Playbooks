@@ -1,0 +1,69 @@
+---
+- name: install git on windows
+  win_chocolatey:
+    name: git
+    state: present
+  when: '"git" in software'
+
+- name: install office on windows
+  win_chocolatey:
+    name: officeproplus2013
+    state: present
+  when: '"officeproplus2013" in software'
+
+- name: install firefox on windows
+  win_chocolatey:
+    name: firefox
+    state: present
+  when: '"firefox" in software'
+
+
+
+- name: install java on windows 
+  win_chocolatey:
+    name: jdk8
+    state: present
+  when: '"java" in software' 
+
+- name: install skype on windows 
+  win_chocolatey:
+    name: skype
+    state: present
+  when: '"skype" in software'
+
+- name: install Antivirus Software on Windows
+  win_chocolatey:
+    name: avastfreeantivirus
+    state: present
+  when: '"Antivirus" in software'
+
+- name: install VNC(Remote Desktop) Software on Windows
+  win_chocolatey:
+    name: ultravnc
+    state: present
+  when: '"VNC" in software'
+
+
+- name: install wamp on windows
+  win_chocolatey:
+    name: wamp-server
+    state: present
+  when: '"wamp" in software'
+
+- name: install PHP on windows
+  win_chocolatey:
+    name: php
+    state: present
+  when: '"php" in software'
+
+- name: Slack Notification 
+  slack:
+    token: T5P0QEGFQ/B6H0FG96U/yKczessxOtbB31VGv2VWkncE
+    domain: https://prodevans-forge.slack.com
+    msg: "{{ ansible_hostname }} {{ software }} installed successfully"
+  when: '"install" in action_opt'
+  delegate_to: localhost  
+
+- name: Rebooting machine 
+  win_reboot:
+  when: '"yes" in reboot_opt and "install" in action_opt'

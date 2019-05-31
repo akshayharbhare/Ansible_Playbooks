@@ -1,0 +1,31 @@
+# vars file for the ports and services to be added to firewall
+ports_allow:
+- 7/tcp
+- 7/udp
+- 23/tcp
+- 23/udp
+
+ports_deny:
+- 80/tcp
+- 80/udp
+
+
+services_allow:
+- ldap
+- ldaps
+
+services_deny:
+- kerberos
+- kpasswd
+
+non_interactive_users:
+- ntp
+
+unwanted_packages:
+- httpd
+- ntp
+- telnet
+
+backup_dir: /var/pb_backup
+
+

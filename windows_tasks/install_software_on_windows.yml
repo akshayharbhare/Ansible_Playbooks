@@ -1,0 +1,16 @@
+---
+- hosts: windows_nodes
+  tasks: 
+  - name: copying script_file from windows machine
+    win_copy: 
+      src: install_software_on_windows_script.ps1 
+      dest: c:\\install_software_on_windows_script.ps1
+
+  - name: copy software setup file
+    win_copy: 
+      src: Firefox_Setup_56.0b7.exe 
+      dest: c:\\Firefox_Setup_56.0b7.exe
+
+  - name: run script to install software
+    win_shell:  c:\install_software_on_windows_script.ps1
+

@@ -1,0 +1,175 @@
+---
+# tasks file for owncloud
+
+- name: Disabling SELinux
+  selinux:
+    state: disabled
+
+- name: Opening 80/http and 443/https ports
+  firewalld:
+    service: "{{ item }}"
+    permanent: true
+    state: enabled
+  with_items:
+  - "{{ ports_allow }}"
+
+- name: determine if EPEL repo is already configured
+  stat: path={{ epel_repo_file }}
+  register: repo
+
+#- name: import EPEL GPG key
+#  rpm_key:
+#    key: "{{ epel_gpg_url }}"
+#    state: present
+#  when: not repo.stat.exists
+
+- name: install EPEL repository
+  yum:
+    name: "{{ epel_repo_url }}"
+    state: present
+  register: result
+  until: '"failed" not in result'
+  retries: 5
+  delay: 10
+  when: not repo.stat.exists
+
+
+- name: installing required packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+  - "{{ pkgs }}"
+
+- name: install the nginx rpm from a remote repo
+  yum:
+    name: http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
+    state: present
+
+- name: starting mariadb_service
+  service:
+    name: mariadb
+    state: started
+
+- name: Install MySQLdb Python package for secure installations.
+  yum:
+    name: MySQL-python
+    state: present
+
+- name: configuring mariadb service
+  include: mysql_secure_installation.yml
+
+- name: configuring php-fpm
+  lineinfile:
+    path: /etc/php-fpm.d/www.conf
+    state: present
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  with_items:
+  - { regexp: '^user = apache', line: 'user = nginx' }
+  - { regexp: '^group = apache', line: 'user = nginx' }
+
+- name: creating directory for session-path
+  file:
+    path: /var/lib/php/session
+    state: directory
+    owner: nginx
+    group: nginx
+
+- name: starting php-fqm
+  systemd:
+    name: php-fpm
+    state: started
+
+- name: starting nginx
+  systemd:
+    name: nginx
+    state: started
+
+- name: Create a new database with name 'owncloud_db'
+  mysql_db:
+    name: owncloud_db
+    state: present
+
+- name: Adding user for newky created database
+  mysql_user:
+    name: ownclouduser
+    password: ownclouduser
+    state: present
+    host: localhost
+    priv: '*.*:ALL,GRANT'
+
+- name: creating directory SSL Certificate
+  file:
+    path: /etc/nginx/cert
+    state: directory
+
+
+- name: Generate an OpenSSL Certificate Signing Request
+  shell: openssl req -new -x509 -days 365 -nodes -out /etc/nginx/cert/owncloud.crt -keyout /etc/nginx/cert/owncloud.key -subj "/C=IN/ST=Karnataka/L=Bangalore/O=Prodevans Technologies/CN=www.prodevans.com"
+
+- name: changing permission of certificate files
+  file:
+    path: '{{ item.path }}'
+    mode: 0600
+    state: file
+  with_items:
+  - { path: '/etc/nginx/cert/owncloud.crt' }
+  - { path: '/etc/nginx/cert/owncloud.key' }
+
+- name: downloading application source
+  get_url:
+    url: https://attic.owncloud.com/org/community/owncloud-8.1.1.tar.bz2
+    dest: /tmp/owncloud-8.1.1.tar.bz2
+
+- name: extracting source file
+  command: tar -xjvf owncloud-8.1.1.tar.bz2
+  args:
+    chdir: /tmp/
+
+- name: moving owncloud directory to html folder
+  command: mv owncloud/ /usr/share/nginx/html/
+  args:
+    chdir: /tmp/
+  ignore_errors: yes
+
+- name: changing owner for owncloud directory
+  file:
+    path: /usr/share/nginx/html/owncloud
+    state: directory
+    owner: nginx
+    group: nginx
+    mode: 0775
+    recurse: yes
+
+- name: creating data directory for owncloud
+  file:
+    path: /usr/share/nginx/html/owncloud/data/
+    state: directory
+    owner: nginx
+    group: nginx
+    mode: 0775
+    recurse: yes
+
+- name: configuring virtualhost for owncloud
+  copy:
+    src: default
+    dest: /etc/nginx/conf.d/default
+
+- name: copy owncloud configurations
+  copy:
+    src: owncloud.conf
+    dest: /etc/nginx/conf.d/owncloud.conf
+
+- name: restarting nginx mariadb php-fpm
+  service:
+    name: '{{ item.service }}'
+    state: restarted
+    enabled: yes
+  with_items:
+  - { service: 'nginx' }
+  - { service: 'mariadb' }
+  - { service: 'php-fpm' }
+
+- name: rebooting system
+  include: reboot.yml

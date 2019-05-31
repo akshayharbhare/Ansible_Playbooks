@@ -1,0 +1,61 @@
+---
+# tasks file for ssh
+
+# Taking backup of sshd_config file before doing changes
+- name: Check the Status of the directory 
+  stat:
+    path: '{{ backup_dir }}/sshd'
+  register: sshd_dir
+  ignore_errors: yes
+#- name: Create a backup directory
+#  file:
+#    path: '{{ backup_dir }}/sshd'
+#    state: directory
+- command: mkdir -p {{ item }}/sshd
+  with_items: "{{backup_dir}}"
+- stat: 
+    path: '{{ backup_dir }}/sshd/sshd_config'
+  register: stat_result
+  ignore_errors: yes
+  
+- name: Take backup of sshd_config
+  command: cp /etc/ssh/sshd_config  '{{ item }}/sshd/sshd_config'
+  with_items: "{{backup_dir}}"
+
+# Configuring sshd_config file
+- name: Adding Timestamp 
+  lineinfile: 
+    path: /etc/ssh/sshd_config
+    insertbefore: "^# This is the sshd server"
+    line: "# {{ ansible_date_time.date }} {{ ansible_date_time.time }}"  
+
+- name: Configure SSH config file
+  lineinfile: 
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items: 
+  - { regexp: '^PermitRootLogin', line: 'PermitRootLogin yes' }
+  - { regexp: '^StrictModes', line: 'StrictModes yes' }
+  - { regexp: '^RSAAuthentication', line: 'RSAAuthentication yes' }
+  - { regexp: '^ServerKeyBits', line: 'ServerKeyBits {{ sshd_serverkeybits }}' }
+  - { regexp: '^X11Forwarding', line: 'X11Forwarding no' }
+  - { regexp: '^LoginGraceTime', line: 'LoginGraceTime {{ sshd_logingracetime }}' }
+  - { regexp: '^RhostsAuthentication', line: 'RhostsAuthentication no'}
+  - { regexp: '^PermitEmptyPasswords', line: 'PermitEmptyPasswords no' }
+  - { regexp: '^KeyRegenerationInterval', line: 'KeyRegenerationInterval {{ sshd_keyregeninterval }}'}
+  - { regexp: '^HostKey', line: 'HostKey {{ sshd_hostkey }}' }
+  - { regexp: '^PasswordAuthentication', line: 'PasswordAuthentication yes'}
+  - { regexp: '^SyslogFacility', line: 'SyslogFacility {{ sshd_syslogfacility }}' }
+  - { regexp: '^LogLevel', line: 'LogLevel {{ sshd_loglevel }}'}
+  - { regexp: '^UsePrivilegeSeparation', line: 'UsePrivilegeSeparation yes' }
+  - { regexp: '^Banner', line: 'Banner {{ sshd_banner }}' }  
+  - { regexp: '^UsePAM', line: 'UsePAM yes' }
+  - { regexp: '^TCPKeepAlive', line: 'TCPKeepAlive yes' }
+  - { regexp: '^PubkeyAuthentication', line: 'PubkeyAuthentication yes' }
+  - { regexp: '^Port', line: 'Port {{ sshd_port }}'}
+  - { regexp: '^Subsystem', line: 'Subsystem       sftp    {{ sshd_sftp }}' }
+  - { regexp: '^Protocol', line: 'Protocol {{ sshd_protocol }}' }
+  - { regexp: '^AuthorizedKeysFile', line: 'AuthorizedKeysFile      {{ sshd_authorized_key }}' }
+  notify:
+  - Restart sshd

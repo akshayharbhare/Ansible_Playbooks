@@ -1,0 +1,10 @@
+- name: Remove Azure VM
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: Remove VM
+    azure_rm_virtualmachine:
+      resource_group: "{{resource_group}}"
+      name: "{{vm_name}}"
+      state: absent
+      remove_on_absent: all

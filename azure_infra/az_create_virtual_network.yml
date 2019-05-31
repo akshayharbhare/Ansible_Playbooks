@@ -1,0 +1,10 @@
+- name: Playbook to create virtual netowrk in Azure!
+  hosts: localhost
+  connection: local
+  tasks:
+  - name: Create a virtual network
+    azure_rm_virtualnetwork:
+      name: "{{virtual_network}}"
+      resource_group: "{{resource_group}}"
+      address_prefixes_cidr:
+        - "{{cidr}}"

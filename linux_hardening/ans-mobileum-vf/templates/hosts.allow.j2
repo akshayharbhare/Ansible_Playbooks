@@ -1,0 +1,34 @@
+#
+# hosts.allow This file contains access rules which are used to
+# allow or deny connections to network services that
+# either use the tcp_wrappers library or that have been
+# started through a tcp_wrappers-enabled xinetd.
+#
+# See 'man 5 hosts_options' and 'man 5 hosts_access'
+# for information on rule syntax.
+# See 'man tcpd' for information on tcp_wrappers
+#
+#
+#HOST in /etc/hosts
+sshd:LOCAL
+#M7vSTP1_EMS
+#sshd:10.248.230.68
+#M7vSTP1 other nodes than EMS, enabled on all vStp1
+sshd:192.168.1.31,192.168.1.32,192.168.1.33,192.168.1.34,192.168.1.35,192.168.1.36
+sshd:192.168.2.31,192.168.2.32,192.168.2.33,192.168.2.34,192.168.2.35,192.168.2.36
+#M7vSTP2_EMS
+sshd:10.248.230.84
+#M7vSTP2 other nodes than EMS, enabled on all vStp2
+#sshd:10.248.230.85,10.248.230.86,10.248.230.87,10.248.230.88,10.248.230.89,10.248.230.90
+#infoVista, enabled only on EMS and ACS
+sshd:10.37.8.203,10.37.80.200,10.37.8.204,10.37.8.205,10.33.2.121,10.33.2.120,10.37.8.206,10.33.2.123,10.33.2.126,10.33.2.127,10.33.2.122,10.33.2.124,10.33.2.125
+#CitrixServer , enabled on all vStp
+sshd:10.103.53.26,10.103.53.27,172.16.138.0/24,10.146.130.128/25,10.33.20.0/23,10.33.212.0/23,172.23.209.0/24
+#Splunk, enabled on all vStp
+sshd:10.33.208.52,10.33.208.53,10.33.208.26,10.33.16.24,10.103.239.5,10.103.223.5,10.103.170.5,10.103.108.5,10.216.10.88,10.216.10.91,10.103.255.5,10.176.160.124,10.176.160.125,10.147.22.10,10.147.22.11,10.103.130.5,10.41.16.147,10.41.16.148
+#HP Data protector, disabled on TDM
+sshd:10.33.208.138
+inet:10.33.208.138
+inet:10.248.232.21
+#ansible managed servers
+sshd:192.168.1.215
