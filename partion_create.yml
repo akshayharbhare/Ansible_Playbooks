@@ -1,0 +1,20 @@
+---
+- hosts: all
+  become: true
+  vars:
+  - Partition1: 1
+  - Partition2: 2
+  - Partition3: 3      #Last Partition
+  - Partition1_Size: 5GB
+  - Partition2_Size: 5GB
+# No need for Partition 3 as all remaining size will be given as it is.
+  tasks:
+
+#  - shell: 'echo -e "n\np\n1\n\n+5GB\nt\n1\n8e\nw" | fdisk /dev/vdb'
+  - shell: 'echo -e "n\np\n{{ Partition1 }}\n\n+{{ Partition1_Size }}\nt\n{{ Partition1 }}\n8e\nw" | fdisk /dev/vdb'
+
+#  - shell: 'echo -e "n\np\n2\n\n+5GB\nt\n2\n8e\nw" | fdisk /dev/vdb'
+  - shell: 'echo -e "n\np\n{{ Partition2 }}\n\n+{{ Partition2_Size }}\nt\n{{ Partition2 }}\n8e\nw" | fdisk /dev/vdb'
+
+#  - shell: 'echo -e "n\np\n3\n\n\nt\n3\n8e\nw" | fdisk /dev/vdb'
+  - shell: 'echo -e "n\np\n{{ Partition3 }}\n\n\nt\n{{ Partition3 }}\n8e\nw" | fdisk /dev/vdb'
