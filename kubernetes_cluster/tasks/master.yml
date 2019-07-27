@@ -1,0 +1,130 @@
+---
+- name: Installing Docker
+  yum:
+    name: docker
+    state: present
+    update_cache: true
+
+- name: Starting Docker Service
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Disabling SELinux
+  command: setenforce 0
+
+- name: Disable SELinux on Boot
+  selinux:
+    state: disabled
+
+- name: Ensure net.bridge.bridge-nf-call-ip6tables is set to 1
+  sysctl:
+    name: net.bridge.bridge-nf-call-ip6tables
+    value: 1
+    state: present
+
+- name: Ensure net.bridge.bridge-nf-call-iptables is set to 1
+  sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: 1
+    state: present
+
+- name: Adding YUM Repo for Kubenetes
+  yum_repository:
+    name: Kubernetes
+    description: Kubernetes YUM repository
+    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+    gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+    gpgcheck: yes
+
+- name: yum cleaning
+  command: yum clean all
+
+- name: Installing Kubelet
+  yum:
+    name: kubelet-1.14.0
+    state: present
+    update_cache: true
+
+- name: Installing Kubeadm
+  yum:
+    name: kubeadm-1.14.0
+    state: present
+
+- name: Starting Kubelet Service
+  service:
+    name: kubelet
+    enabled: yes
+    state: started
+
+- name: Installing Kubectl
+  yum:
+    name: kubectl-1.14.0
+    state: present
+    allow_downgrade: yes
+
+- name: Installing firewalld
+  yum:
+    name: firewalld
+    state: latest
+
+- name: Starting firewalld service
+  service:
+    name: firewalld
+    state: restarted
+    enabled: yes
+
+- name: Enabling firewalld ports
+  firewalld: 
+    port: "{{ item }}"
+    permanent: true
+    state: enabled
+  with_items:
+  - "{{ ports_allow_master }}"
+
+- name: reload service firewalld
+  systemd:
+    name: firewalld
+    state: reloaded
+
+- name: Making swap support
+  command: swapoff -a
+
+- name: initialize the cluster
+  shell: kubeadm init >> cluster_initialized.txt
+  args:
+    chdir: $HOME
+    creates: cluster_initialized.txt
+
+- name: create .kube directory
+  file:
+    path: $HOME/.kube
+    state: directory
+    mode: 0755
+
+- name: copy admin.conf to user's kube config
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /root/.kube/config
+    remote_src: yes
+
+- name: install Pod network
+  shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/a70459be0084506e4ec919aa1c114638878db11b/Documentation/kube-flannel.yml >> pod_network_setup.txt
+  args:
+    chdir: $HOME
+    creates: pod_network_setup.txt
+
+- name: generate toke with join command
+  command: kubeadm token create --print-join-command
+  register: join_command
+
+- debug: var=join_command.stdout_lines[0]
+
+- name: Making entries of join command in file and delegating to localhost
+  lineinfile:
+    path: /tmp/join_command.sh
+    line: "{{ join_command.stdout_lines[0] }} --ignore-preflight-errors all"
+    state: present
+    create: yes
+  delegate_to: localhost

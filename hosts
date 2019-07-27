@@ -1,0 +1,13 @@
+#54.159.56.75 ansible_ssh_private_key_file=/root/Videos/sam.pem ansible_python_interpreter=/usr/bin/python
+#18.233.97.220 ansible_ssh_private_key_file=/root/Videos/sam.pem ansible_ssh_user=ubuntu
+#54.165.192.193 ansible_ssh_private_key_file=/root/Videos/sam.pem ansible_ssh_user=centos
+#54.90.251.117	ansible_ssh_private_key_file=/root/Videos/sam.pem ansible_ssh_user=root	ansible_python_interpreter=/usr/bin/python2.6 ansible_ssh_user=root
+#54.162.50.197	ansible_ssh_user=centos	ansible_ssh_private_key_file=/root/Videos/sam.pem
+
+#Kubenetes Cluster Node Details
+
+[master_node]
+192.168.122.140
+[worker_node]
+192.168.122.65
+192.168.122.132

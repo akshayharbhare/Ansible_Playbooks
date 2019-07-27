@@ -1,0 +1,24 @@
+---
+# tasks file for kubernetes
+
+- name: Add mappings to /etc/hosts
+  blockinfile:
+    path: /etc/hosts
+    state: present
+    block: |
+      {{ item.ip }} {{ item.name }} {{ item.fqdn }}
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.name }}"
+  with_items:
+    - { name: '{{ master_hostname }}', ip: '{{ master_ip }}', fqdn: '{{ master_fqdn }}' }
+    - { name: '{{ worker1_hostname }}', ip: '{{ worker1_ip }}', fqdn: '{{ worker1_fqdn }}' }
+    - { name: '{{ worker2_hostname }}', ip: '{{ worker2_ip }}', fqdn: '{{ worker2_fqdn }}' }
+
+
+- name: Configuring Master Node for Kubernetes
+  include: master.yml
+  when: inventory_hostname in groups['master_node']
+
+
+- name: Configuring Worker Node for Kubernetes
+  include: worker.yml
+  when: inventory_hostname in groups['worker_node']

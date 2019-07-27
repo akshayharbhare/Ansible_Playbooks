@@ -1,0 +1,14 @@
+---
+# defaults file for kubernetes
+
+master_ip: "192.168.122.140"
+master_hostname: "master.localdomain"
+master_fqdn: "master"
+
+worker1_ip: "192.168.122.65"
+worker1_hostname: "worker1.localdomain"
+worker1_fqdn: "worker1"
+
+worker2_ip: "192.168.122.132"
+worker2_hostname: "worker2.localdomain"
+worker2_fqdn: "worker2"

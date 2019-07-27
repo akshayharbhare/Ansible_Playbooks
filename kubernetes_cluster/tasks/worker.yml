@@ -1,0 +1,105 @@
+---
+- name: Installing Docker
+  yum:
+    name: docker
+    state: present
+    update_cache: true
+
+- name: Starting Docker Service
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Disabling SELinux
+  command: setenforce 0
+
+- name: Disable SELinux on Boot
+  selinux:
+    state: disabled
+
+- name: Ensure net.bridge.bridge-nf-call-ip6tables is set to 1
+  sysctl:
+    name: net.bridge.bridge-nf-call-ip6tables
+    value: 1
+    state: present
+
+- name: Ensure net.bridge.bridge-nf-call-iptables is set to 1
+  sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: 1
+    state: present
+
+- name: Adding YUM Repo for Kubenetes
+  yum_repository:
+    name: Kubernetes
+    description: Kubernetes YUM repository
+    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+    gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+    gpgcheck: yes
+
+- name: yum cleaning
+  command: yum clean all
+
+- name: Installing firewalld
+  yum:
+    name: firewalld
+    state: latest
+
+- name: Starting firewalld service
+  service:
+    name: firewalld
+    state: restarted
+    enabled: yes
+
+- name: Enabling firewalld ports
+  firewalld:
+    port: "{{ item }}"
+    permanent: true
+    state: enabled
+  with_items:
+  - "{{ ports_allow_worker }}"
+
+- name: Making swap support
+  command: swapoff -a
+
+- name: Installing Kubelet
+  yum:
+    name: kubelet-1.14.0
+    state: present
+    update_cache: true
+
+- name: Installing Kubeadm
+  yum:
+    name: kubeadm-1.14.0
+    state: present
+
+- name: Starting Kubelet Service
+  service:
+    name: kubelet
+    enabled: yes
+    state: started
+
+#- name: adding worker node to kubernetes cluster
+#  shell: "{{ join_command.stdout_lines[0] }}"
+#  shell: "{{ join_command1 }}"
+#  ignore_errors: yes
+
+#- name: copying join command script on worker node
+#  copy:
+#    src: /tmp/join_command.sh
+#    dest: /tmp/join_command.sh
+#    force: yes
+#    mode: 0755
+
+- name: running join command
+  script: /tmp/join_command.sh
+
+- name: Deleting join command script
+  file:
+    path: /tmp/join_command.sh
+    state: absent
+  delegate_to: localhost
+
+- debug:
+    msg: "Execute the Command: 'kubectl get nodes' on Master Node to check the Kubernetes Cluster"
